@@ -12,16 +12,6 @@ module Binenc
         instance_eval(&block) 
       end
 
-      def load_definition(path)
-        raise BinencEngineException, "Given spec to load '#{path}' does not exist" if not File.exist?(path)
-        File.open(path,"r") do |f|
-          @cont = f.read
-        end
-
-        instance_eval(@cont)
-      end
-
-
       def encoded
         res = []
         structure.each do |st|
