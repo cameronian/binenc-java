@@ -54,6 +54,9 @@ RSpec.describe "Define binary structure and helpers to manage the structure" do
     expect(st.seq == af.seq).to be true
     expect(st.valid.to_i == af.valid.to_i).to be true
 
+    sts = afr.value_from_bin_struct(res, 0, 1)
+    p sts
+
     afe = Binenc::EngineFactory.instance(:bin_struct)
     afe.define do
       oid :oid

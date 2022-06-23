@@ -7,9 +7,11 @@ module Binenc
     # simple binary layout factory
     class SBLFactory
       include SBLDSL
+      include DataConversion
 
       def define(&block)
         instance_eval(&block) 
+        self
       end
 
       def encoded
@@ -39,6 +41,51 @@ module Binenc
 
         self
 
+      end
+
+      def value_from_bin_struct(bin, *fieldNo)
+
+        seq = ASN1Object.decode(bin).value
+
+        ret = []
+        fieldNo.each do |fn|
+          raise BinencEngineException, "Given field no '#{fn}' to extract is larger than found fields (#{seq.length})" if fn > seq.length
+
+          v = seq[fn]
+          if v.is_a?(::Java::OrgBouncycastleAsn1::ASN1Object)
+            case v
+            when ::Java::OrgBouncycastleAsn1::DERBitString
+              #vv = String.from_java_bytes(v.bytes)
+              vv = to_java_bytes(v.bytes)
+            when ::Java::OrgBouncycastleAsn1::DERUTF8String
+              vv = v.to_s
+            when ::Java::OrgBouncycastleAsn1::ASN1Integer
+              vv = v.value
+            #when ::Java::OrgBouncycastleAsn1::DERSequence, ::Java::OrgBouncycastleAsn1::DLSequence
+            #  to_value(v.to_a)
+            when ::Java::OrgBouncycastleAsn1::ASN1GeneralizedTime
+              d = v.date
+              vv = Time.at(d.time/1000)
+            when ::Java::OrgBouncycastleAsn1::ASN1ObjectIdentifier
+              vv = v.id
+            else
+              raise BinencEngineException, "Unhandled ASN1 object '#{obj.class}'"
+            end
+
+            #begin
+            #  vv = ASN1Object.decode(v).value
+            #rescue OpenSSL::ASN1::ASN1Error
+            #  vv = v
+            #end
+          else
+            vv = v
+          end
+
+          ret << vv
+
+        end
+
+        ret
       end
 
       private

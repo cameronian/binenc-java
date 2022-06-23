@@ -64,6 +64,19 @@ module Binenc
               ASN1Sequence.new(e).encoded(false)
             when Time, java.util.Date
               ASN1DateTime.new(e).encoded(false)
+
+            when ::Java::OrgBouncycastleAsn1::DERBitString
+              ASN1Binary.new(e.bytes).encoded(false)
+            when ::Java::OrgBouncycastleAsn1::DERUTF8String
+              ASN1String.new(e.to_s).encoded(false)
+            when ::Java::OrgBouncycastleAsn1::ASN1Integer
+              ASN1Integer.new(e.value).encoded(false)
+            when ::Java::OrgBouncycastleAsn1::DERSequence, ::Java::OrgBouncycastleAsn1::DLSequence
+              ASN1Sequence.new(e.to_a).encoded(false)
+            when ::Java::OrgBouncycastleAsn1::ASN1GeneralizedTime
+              ASN1DateTime.new(e.date).encoded(false)
+            when ::Java::OrgBouncycastleAsn1::ASN1ObjectIdentifier
+              ASN1OID.new(e.id).encoded(false)
             else
               logger.debug "Oopss #{e} / #{e.class}"
               nil
