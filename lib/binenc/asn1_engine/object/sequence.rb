@@ -60,6 +60,8 @@ module Binenc
               else
                 ASN1String.new(e).encoded(false)
               end
+            when ::Java::byte[]
+              ASN1Binary.new(e).encoded(false)
             when Array
               ASN1Sequence.new(e).encoded(false)
             when Time, java.util.Date
